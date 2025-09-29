@@ -70,7 +70,6 @@ public class TransformationController : MonoBehaviour
 
     void SwapToPrefab(GameObject targetPrefab, VehicleMode newMode)
     {
-        // TODO(human): Implement prefab swapping logic
         // 1. Store current position and rotation
         Vector3 currentPosition = transform.position;
         Quaternion currentRotation = transform.rotation;
