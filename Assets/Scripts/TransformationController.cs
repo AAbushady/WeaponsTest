@@ -74,11 +74,18 @@ public class TransformationController : MonoBehaviour
         Vector3 currentPosition = transform.position;
         Quaternion currentRotation = transform.rotation;
 
+        // TODO(human): When transforming to Car, use camera forward direction instead
+        // Check if newMode == VehicleMode.Car
+        // If so, find the main camera and create rotation from its forward direction
+        // Hint: Camera.main.transform.forward gives camera direction
+        // Use Quaternion.LookRotation(cameraForward) to create rotation
+        // But keep Y rotation only (flatten to horizontal plane)
+
         // 2. Instantiate the new prefab at the same location
         GameObject newVehicle = Instantiate(targetPrefab, currentPosition, currentRotation);
 
         // 4. Make sure the new prefab has this script and set its currentMode
-        currentMode = newMode;
+        newVehicle.GetComponent<TransformationController>().currentMode = newMode;
 
         // 3. Destroy this current game object (do this LAST!)
         Destroy(gameObject);

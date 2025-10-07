@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 773242493685743855}
   - component: {fileID: 4689800552271655368}
   - component: {fileID: -5351403800100881660}
-  m_Layer: 0
+  - component: {fileID: -1124155541035896514}
+  m_Layer: 3
   m_Name: PlayerRobot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,3 +126,21 @@ MonoBehaviour:
   robotPrefab: {fileID: 3122239766909769621}
   transformKey: 116
   currentMode: 1
+--- !u!114 &-1124155541035896514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3122239766909769621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47fa3e896ecf65141a06721069fcd6bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mouseSensitivity: 2
+  groundLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  playerCamera: {fileID: 0}
+  aimingRayOffset: 5
