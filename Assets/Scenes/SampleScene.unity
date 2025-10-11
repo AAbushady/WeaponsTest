@@ -136,11 +136,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47fa3e896ecf65141a06721069fcd6bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mouseSensitivity: 2
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
   playerCamera: {fileID: 330585545}
+  maxAimDistance: 100
 --- !u!1001 &104810091
 PrefabInstance:
   m_ObjectHideFlags: 0

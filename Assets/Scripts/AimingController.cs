@@ -67,7 +67,7 @@ public class AimingController : MonoBehaviour
         Debug.DrawRay(aimingRay.origin, aimingRay.direction * maxAimDistance, Color.red);
 
         // Get ALL hits along the ray
-        RaycastHit[] hits = Physics.RaycastAll(aimingRay, Mathf.Infinity);
+        RaycastHit[] hits = Physics.RaycastAll(aimingRay, maxAimDistance);
 
         foreach (RaycastHit hit in hits)
         {
