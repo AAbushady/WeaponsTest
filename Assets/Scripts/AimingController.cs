@@ -5,6 +5,9 @@ public class AimingController : MonoBehaviour
     [Header("References")]
     public Camera playerCamera;
 
+    [Header("Settings")]
+    public float maxAimDistance = 100f;
+
     private TransformationController transformController;
     private bool isAiming = false;
 
@@ -61,7 +64,7 @@ public class AimingController : MonoBehaviour
         Ray aimingRay = playerCamera.ScreenPointToRay(mousePosition);
 
         // Debug: visualize the ray in Scene view
-        Debug.DrawRay(aimingRay.origin, aimingRay.direction * 100f, Color.red);
+        Debug.DrawRay(aimingRay.origin, aimingRay.direction * maxAimDistance, Color.red);
 
         // Get ALL hits along the ray
         RaycastHit[] hits = Physics.RaycastAll(aimingRay, Mathf.Infinity);
@@ -81,7 +84,7 @@ public class AimingController : MonoBehaviour
         }
         else
         {
-            Vector3 farPoint = aimingRay.origin + aimingRay.direction * 100f;
+            Vector3 farPoint = aimingRay.origin + aimingRay.direction * maxAimDistance;
             targetPosition = new Vector3(farPoint.x, transform.position.y, farPoint.z);
         }
 

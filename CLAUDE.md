@@ -4,88 +4,106 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Unity 6000.0.55f1 project named "WeaponsTest" that serves as a dedicated development environment for creating vehicle weapons and transformation systems. This project is intended to be a modular component that will be integrated into a larger main game project. The focus is specifically on developing and testing vehicle-based weaponry and transformation mechanics, not player character systems.
+Unity 6000.0.58f2 project developing a vehicle transformation and weapons system prototype. The project focuses on a car-to-robot transformation mechanic with an aiming system that enables different behaviors depending on the current vehicle form. This is intended as a modular component for integration into a larger game project.
 
-## Key Dependencies & Packages
+## Key Packages
 
-The project uses several Unity packages relevant to vehicle weapons and transformation systems:
-- **Unity Input System (1.14.1)**: Modern input handling (likely default Unity template, may need reconfiguration for vehicle controls)
-- **Universal Render Pipeline (17.0.4)**: Modern rendering pipeline for optimized graphics and visual effects
-- **AI Navigation (2.0.8)**: Potential use for autonomous weapon targeting or vehicle AI behaviors
-- **Timeline (1.8.7)**: Useful for complex transformation sequences and weapon deployment animations
-- **Test Framework (1.5.1)**: Unit testing capabilities for weapons systems
-- **Visual Scripting (1.9.7)**: Node-based scripting for rapid prototyping of weapon behaviors
+- **Unity Input System (1.14.2)**: Input management with configured action maps for Player and UI controls
+- **Universal Render Pipeline (17.0.4)**: Modern rendering pipeline for visual effects
+- **AI Navigation (2.0.9)**: Navigation mesh system (potential use for AI behaviors)
+- **Timeline (1.8.9)**: Animation sequencing (potential use for transformation sequences)
+- **Visual Scripting (1.9.7)**: Node-based scripting system
 
 ## Project Structure
 
 ```
 Assets/
-├── InputSystem_Actions.inputactions  # Input action definitions for player controls
-├── Materials/                        # Material assets
-├── Prefabs/                         # Reusable game objects
+├── InputSystem_Actions.inputactions  # Configured with Move, Look, Attack, Interact, Jump, Transform actions
 ├── Scenes/
-│   └── SampleScene.unity            # Main scene
-├── Scripts/                         # C# scripts (currently empty)
-├── Settings/                        # Project-specific settings
-└── TutorialInfo/                    # Tutorial/readme components
+│   └── SampleScene.unity            # Main development scene
+├── Scripts/
+│   ├── TransformationController.cs  # Handles car ↔ robot transformation via prefab swapping
+│   └── AimingController.cs          # Mouse-based aiming in robot mode
+├── Prefabs/
+│   ├── PlayerCar.prefab             # Car form prefab
+│   ├── PlayerRobot.prefab           # Robot form prefab
+│   ├── Wheel.prefab                 # Wheel component
+│   └── NPC.prefab                   # NPC entity
+├── Materials/                       # Material assets
+└── Settings/                        # Project configuration
 ```
 
-## Development Commands
+## Core Systems
 
-### Building the Project
+### Transformation System (TransformationController.cs)
+- **Pattern**: Prefab-swapping architecture - destroys current GameObject and instantiates the target form
+- **Key Mechanism**: Preserves position between transformations; when transforming to car, aligns rotation with camera forward direction
+- **State**: Uses `VehicleMode` enum (Car/Robot) to track current form
+- **Trigger**: Press T key (configurable via `transformKey`)
+- **Important**: Both prefabs must have TransformationController component attached with proper prefab references
+
+### Aiming System (AimingController.cs)
+- **Activation**: Only functional in Robot mode (mode-dependent behavior)
+- **Mechanism**: Uses camera raycasting to determine aim direction, rotates entire robot GameObject to face mouse cursor
+- **Raycast Logic**: Filters out self and child colliders, defaults to far point if no valid hit
+- **Future Integration**: `GetAimDirection()` provides aim vector for weapon systems
+
+## Development Notes
+
+### Working with Transformation
+- The transformation preserves world position but not velocity or other physics state
+- Car transformation aligns with camera forward direction (flattened to horizontal plane)
+- Both prefabs need TransformationController with `carPrefab` and `robotPrefab` assigned in Inspector
+
+### Input System Configuration
+- Action map: **Player** with actions for Move (WASD/arrows/gamepad), Look (mouse/right stick), Attack (LMB/button), Jump (Space/button), Interact (E/button hold), Transform (bound to T - see TransformationController)
+- Supports multiple control schemes: Keyboard&Mouse, Gamepad, Touch, Joystick, XR
+
+### Testing in Unity
+1. Open project in Unity Editor (Unity 6000.0.58f2)
+2. Open `Assets/Scenes/SampleScene.unity`
+3. Press Play to test transformation and aiming systems
+4. Use T to transform between car and robot modes
+5. In robot mode, mouse movement controls aiming direction
+
+### Common Tasks
+
+**Run Tests**:
 ```bash
-# Open Unity Hub and build through the editor, or use Unity command line:
-Unity -batchmode -quit -projectPath . -buildTarget StandaloneWindows64 -buildPath ./Builds/
+# Via Unity Test Runner in Editor, or command line:
+"C:\Program Files\Unity\Hub\Editor\6000.0.58f2\Editor\Unity.exe" -runTests -batchmode -projectPath . -testResults TestResults.xml
 ```
 
-### Testing
+**Build Project**:
 ```bash
-# Run tests through Unity Test Runner in the editor, or via command line:
-Unity -batchmode -runTests -projectPath . -testResults ./TestResults.xml
+# Build via Unity Editor (File > Build Settings) or command line:
+"C:\Program Files\Unity\Hub\Editor\6000.0.58f2\Editor\Unity.exe" -quit -batchmode -projectPath . -buildTarget StandaloneWindows64 -buildPath ./Builds/
 ```
 
-### Opening the Project
-```bash
-# Open in Unity Editor
-Unity -projectPath .
-```
+## Architecture Patterns
 
-## Architecture Notes
+### Prefab Swapping Pattern
+The transformation system uses prefab swapping rather than animation/timeline sequences. This allows completely different GameObject hierarchies for each form but requires careful state management when adding new systems.
 
-- **Input System**: Contains default input actions that will likely need reconfiguration for vehicle weapon controls and transformation triggers
-- **Empty Scripts Folder**: Ready for development of weapon systems, transformation mechanics, and vehicle component scripts
-- **URP Configuration**: Uses Universal Render Pipeline which is ideal for weapon visual effects, muzzle flashes, and transformation particle systems
-- **Modular Design**: Project structure supports development of reusable weapon and transformation components for integration into the main game
-- **Modern Unity Patterns**: Built on Unity 6000.x with modern package management, suitable for complex mechanical systems
+**Implications for new features**:
+- State that needs to persist across transformations must be stored externally or passed during SwapToPrefab
+- Components that depend on specific GameObjects must handle prefab swapping gracefully
+- Consider adding a state manager if more persistent data is needed
 
-## Important Files
+### Mode-Dependent Behaviors
+The aiming system demonstrates the mode-dependent pattern where behaviors are enabled/disabled based on `VehicleMode`. Use this pattern for future weapon systems or movement controllers.
 
-- `Assets/InputSystem_Actions.inputactions`: Default input actions (will need customization for vehicle weapon controls)
-- `Packages/manifest.json`: Defines package dependencies and versions
-- `ProjectSettings/ProjectVersion.txt`: Unity version information
-- `Assets/Scenes/SampleScene.unity`: Main development and testing scene for weapons systems
+## Future Development Considerations
 
-## Development Considerations
+### Weapons Systems
+- Use `AimingController.GetAimDirection()` to determine projectile direction
+- Implement weapon components that check `TransformationController.currentMode` for mode-specific weapon availability
+- Consider creating a weapon manager that handles transformation state changes
 
-- **Weapons Systems**: Place weapon scripts in `Assets/Scripts/Weapons/` with clear naming conventions (e.g., `LaserCannon.cs`, `MissileSystem.cs`)
-- **Transformation Systems**: Create transformation scripts in `Assets/Scripts/Transformations/` for vehicle morphing mechanics
-- **Modular Architecture**: Design components for easy integration into the main game project
-- **URP Visual Effects**: Leverage URP for weapon particle effects, energy beams, and transformation animations
-- **Timeline Integration**: Use Timeline for complex transformation sequences and synchronized weapon deployments
-- **Testing Framework**: Implement unit tests for weapon damage calculations, transformation states, and system interactions
+### State Persistence
+- Current implementation doesn't preserve velocity, rotation speed, or other physics state across transformations
+- If more complex state is needed, implement a state manager component that survives transformations
 
-## Weapon System Development Focus Areas
-
-- **Projectile Systems**: Bullets, missiles, energy weapons with ballistics and targeting
-- **Transformation Mechanics**: Vehicle shape-changing, weapon deployment/retraction systems
-- **Targeting Systems**: Auto-aim, manual targeting, trajectory calculation
-- **Damage Systems**: Modular damage calculation and effect application
-- **Visual Effects**: Muzzle flashes, impact effects, transformation particle systems
-- **Audio Integration**: Weapon firing sounds, transformation mechanical sounds
-
-## Notes for Future Development
-
-- Empty Scripts folder ready for weapons and transformation system development
-- Default input actions will need reconfiguration for vehicle-specific controls
-- Project structure supports modular component development for main game integration
-- Timeline system ready for complex mechanical transformation sequences
+### Camera System
+- Both systems reference `Camera.main` - consider creating a dedicated camera controller for more complex camera behaviors
+- Camera direction influences car transformation alignment (see TransformationController.cs:78-90)
