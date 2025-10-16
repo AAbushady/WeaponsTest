@@ -2,13 +2,28 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    public float speed = 50f;
+    [Header("Projectile Settings")]
+    public float speed;
+    public float lifetime;
 
     private GameObject shooter;
+    private float spawnTime;
+
+    void Start()
+    {
+        spawnTime = Time.time;
+    }
 
     void Update()
     {
+        // Move the projectile
         transform.position += speed * Time.deltaTime * transform.forward;
+        
+        // Check lifetime
+        if (Time.time - spawnTime >= lifetime)
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     public void SetShooter(GameObject shooter)

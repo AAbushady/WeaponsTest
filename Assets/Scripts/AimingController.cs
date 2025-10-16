@@ -80,12 +80,12 @@ public class AimingController : MonoBehaviour
 
         if (validHit.HasValue)
         {
-            targetPosition = new Vector3(validHit.Value.point.x, transform.position.y, validHit.Value.point.z);
+            targetPosition = new Vector3(validHit.Value.point.x, validHit.Value.point.y, validHit.Value.point.z);
         }
         else
         {
             Vector3 farPoint = aimingRay.origin + aimingRay.direction * maxAimDistance;
-            targetPosition = new Vector3(farPoint.x, transform.position.y, farPoint.z);
+            targetPosition = new Vector3(farPoint.x, farPoint.y, farPoint.z);
         }
 
         transform.LookAt(targetPosition);
@@ -98,7 +98,7 @@ public class AimingController : MonoBehaviour
         {
             return transform.forward;
         }
-        
+
         return Vector3.forward; // Default forward if not aiming
     }
 }
