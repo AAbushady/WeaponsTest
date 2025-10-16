@@ -120,8 +120,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5697531398812546479}
   - component: {fileID: 2444809943916516808}
-  - component: {fileID: -1183131946154496255}
-  - component: {fileID: -3696945380674322269}
   m_Layer: 3
   m_Name: PlayerCar
   m_TagString: Untagged
@@ -177,39 +175,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &-1183131946154496255
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 867421480580682418}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b6d0b992332aad744851d1f10f6aeb24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  carPrefab: {fileID: 867421480580682418}
-  robotPrefab: {fileID: 3122239766909769621, guid: f9358f1e802e6d346b8578a9346f2a9b, type: 3}
-  transformKey: 116
-  currentMode: 0
---- !u!114 &-3696945380674322269
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 867421480580682418}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47fa3e896ecf65141a06721069fcd6bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mouseSensitivity: 2
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  playerCamera: {fileID: 0}
 --- !u!1 &3956197240585853791
 GameObject:
   m_ObjectHideFlags: 0

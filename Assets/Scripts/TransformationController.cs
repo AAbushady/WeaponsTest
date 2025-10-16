@@ -19,6 +19,15 @@ public class TransformationController : MonoBehaviour
     [Header("Current State")]
     public VehicleMode currentMode = VehicleMode.Car;
 
+    private GameObject currentPrefab;
+
+    void Start()
+    {
+        if (transform.childCount > 0)
+        {
+            currentPrefab = transform.GetChild(0).gameObject;
+        }
+    }
 
     void Update()
     {
@@ -70,32 +79,41 @@ public class TransformationController : MonoBehaviour
 
     void SwapToPrefab(GameObject targetPrefab, VehicleMode newMode)
     {
-        // 1. Store current position and rotation
-        Vector3 currentPosition = transform.position;
-        Quaternion currentRotation = transform.rotation;
+        // Step 1: If there's a current model (child), destroy it
+        if (currentPrefab != null)
+        {
+            Destroy(currentPrefab);
+        }
 
-        // 2. If transforming to Car, align with camera forward direction
-        if (newMode == VehicleMode.Car)
+        // Step 2: Instantiate the new child model
+        GameObject newPrefab = Instantiate(targetPrefab);
+
+        // Step 3: Make it a child of THIS GameObject (the Player parent)
+        newPrefab.transform.SetParent(transform);
+
+        // Step 4: Reset the child's local position/rotation so it's centered on parent
+        newPrefab.transform.localPosition = Vector3.zero;
+        newPrefab.transform.localRotation = Quaternion.identity;
+
+        // Step 4.5: If changing from Robot to Car, reset camera position forward
+        if (currentMode == VehicleMode.Robot && newMode == VehicleMode.Car)
         {
             Camera mainCamera = Camera.main;
             if (mainCamera != null)
             {
                 Vector3 cameraForward = mainCamera.transform.forward;
                 cameraForward.y = 0; // Flatten to horizontal plane
-                if (cameraForward.sqrMagnitude > 0.001f) // Avoid zero-length vector
+                if (cameraForward.sqrMagnitude > 0.01f)
                 {
-                    currentRotation = Quaternion.LookRotation(cameraForward);
+                    transform.rotation = Quaternion.LookRotation(cameraForward);
                 }
             }
         }
 
-        // 3. Instantiate the new prefab at the same location
-        GameObject newVehicle = Instantiate(targetPrefab, currentPosition, currentRotation);
+        // Step 5: Store reference to the new model for next swap
+        currentPrefab = newPrefab;
 
-        // 4. Make sure the new prefab has this script and set its currentMode
-        newVehicle.GetComponent<TransformationController>().currentMode = newMode;
-
-        // 5. Destroy this current game object (do this LAST!)
-        Destroy(gameObject);
+        // Step 6: Update the mode
+        currentMode = newMode;
     }
 }

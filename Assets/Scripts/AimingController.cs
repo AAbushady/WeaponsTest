@@ -13,7 +13,7 @@ public class AimingController : MonoBehaviour
 
     void Start()
     {
-        transformController = GetComponent<TransformationController>();
+        transformController = GetComponentInParent<TransformationController>();
 
         // Find camera if not assigned
         if (playerCamera == null)
@@ -98,6 +98,7 @@ public class AimingController : MonoBehaviour
         {
             return transform.forward;
         }
+        
         return Vector3.forward; // Default forward if not aiming
     }
 }
