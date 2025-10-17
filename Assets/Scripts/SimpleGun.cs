@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -5,6 +6,9 @@ public class SimpleGun : MonoBehaviour
 {
     public GameObject bulletPrefab;
     public float fireRate = 10f; // Rounds per second
+
+    [Header("Visual Effects")]
+    public GameObject muzzleFlash;
 
     private float lastFireTime;
     private float delayTime = 1.0f;
@@ -19,6 +23,8 @@ public class SimpleGun : MonoBehaviour
 
     void Fire()
     {
+        GameObject childObject = null;
+
         if (bulletPrefab != null)
         {
             Quaternion aimDirection = transform.rotation; // Default to forward direction
@@ -30,14 +36,23 @@ public class SimpleGun : MonoBehaviour
                 {
                     aimDirection = Quaternion.LookRotation(aimingController.GetAimDirection());
                 }
+
+                childObject = transform.GetChild(0).gameObject;
+
+                Vector3 bulletSpawnPoint = childObject.transform.position + childObject.transform.forward * 2;
+
+                if (muzzleFlash != null)
+                {
+                    Instantiate(muzzleFlash, bulletSpawnPoint, aimDirection);
+                }
+
+                GameObject newBullet = Instantiate(bulletPrefab, bulletSpawnPoint, aimDirection);
+
+                // should set shooter to child of Player
+                newBullet.GetComponent<Projectile>().SetShooter(childObject);
+
+                lastFireTime = Time.time + (delayTime / fireRate);
             }
-
-            GameObject newBullet = Instantiate(bulletPrefab, transform.position, aimDirection);
-
-            // should set shooter to child of Player
-            newBullet.GetComponent<Projectile>().SetShooter(transform.GetChild(0).gameObject);
-
-            lastFireTime = Time.time + (delayTime / fireRate);
         }
         else
         {

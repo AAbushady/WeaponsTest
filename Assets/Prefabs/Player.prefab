@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 8517682876232623326, guid: ab30be59758013546a86202f6c15da08, type: 3}
   fireRate: 10
+  muzzleFlash: {fileID: 100006, guid: b0a227fc2e558f241b1c747820ccc361, type: 3}
 --- !u!114 &2650577333856281690
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -126,6 +126,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 50
   lifetime: 2
+  impactEffect: {fileID: 8355528800608334192, guid: 16d46bbb3c1a5d640886b7d9c35a93db, type: 3}
 --- !u!54 &3033849178035425128
 Rigidbody:
   m_ObjectHideFlags: 0

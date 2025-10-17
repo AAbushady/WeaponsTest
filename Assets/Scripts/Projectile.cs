@@ -6,6 +6,9 @@ public class Projectile : MonoBehaviour
     public float speed;
     public float lifetime;
 
+    [Header("Visual Effects")]
+    public GameObject impactEffect;
+
     private GameObject shooter;
     private float spawnTime;
     private Rigidbody rb;
@@ -33,15 +36,15 @@ public class Projectile : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-       HandleImpact(other.gameObject);
+       HandleImpact(other.gameObject, transform.position);
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        HandleImpact(collision.gameObject);
+        HandleImpact(collision.gameObject, collision.GetContact(0).point);
     }
 
-    private void HandleImpact(GameObject hitObject)
+    private void HandleImpact(GameObject hitObject, Vector3 impactPoint)
     {
         // Only check parent if shooter still exists
         if (shooter != null)
@@ -51,8 +54,15 @@ public class Projectile : MonoBehaviour
                 return; // Ignore collision with shooter or its children
             }
         }
+
         // Hit something valid (or shooter was destroyed, treat as valid hit)
         Debug.Log($"Bullet hit: {hitObject.name}");
+        
+        if (impactEffect != null)
+        {
+            Instantiate(impactEffect, impactPoint, Quaternion.identity);
+        }
+
         Destroy(this.gameObject);
     }
 }
