@@ -23,12 +23,20 @@ Assets/
 │   └── SampleScene.unity            # Main development scene
 ├── Scripts/
 │   ├── TransformationController.cs  # Handles car ↔ robot transformation via prefab swapping
-│   └── AimingController.cs          # Mouse-based aiming in robot mode
+│   ├── AimingController.cs          # Mouse-based aiming in robot mode
+│   ├── SimpleGun.cs                 # Weapon firing system integrated with aiming
+│   ├── Projectile.cs                # Base projectile physics and collision handling
+│   └── BulletProjectile.cs          # Bullet-specific projectile (extends Projectile)
 ├── Prefabs/
 │   ├── PlayerCar.prefab             # Car form prefab
 │   ├── PlayerRobot.prefab           # Robot form prefab
+│   ├── Player.prefab                # Parent container with TransformationController
+│   ├── Bullet.prefab                # Projectile prefab with velocity-based physics
+│   ├── ImpactEffect.prefab          # Bullet impact VFX
+│   ├── WFX_MF 4P RIFLE2.prefab      # Muzzle flash effect from WarFX
 │   ├── Wheel.prefab                 # Wheel component
 │   └── NPC.prefab                   # NPC entity
+├── JMO Assets/WarFX/                # Third-party visual effects package for weapons
 ├── Materials/                       # Material assets
 └── Settings/                        # Project configuration
 ```
@@ -45,8 +53,23 @@ Assets/
 ### Aiming System (AimingController.cs)
 - **Activation**: Only functional in Robot mode (mode-dependent behavior)
 - **Mechanism**: Uses camera raycasting to determine aim direction, rotates entire robot GameObject to face mouse cursor
-- **Raycast Logic**: Filters out self and child colliders, defaults to far point if no valid hit
-- **Future Integration**: `GetAimDirection()` provides aim vector for weapon systems
+- **Raycast Logic**: Filters out self and child colliders using `RaycastAll`, defaults to far point if no valid hit
+- **Integration**: `GetAimDirection()` provides aim vector consumed by weapon systems
+- **Cursor Behavior**: Shows cursor in robot mode, hides in car mode
+
+### Weapons System (SimpleGun.cs + Projectile.cs)
+- **Firing**: SimpleGun handles fire rate limiting and projectile spawning
+- **Projectile Pattern**: Velocity-based physics using Rigidbody.linearVelocity (Unity 6 API)
+- **Collision Avoidance**: Projectiles track their shooter and ignore collisions with shooter's hierarchy
+- **Visual Effects**: Integrated with WarFX assets for muzzle flashes and impact effects
+- **Lifetime Management**: Projectiles auto-destroy after configurable lifetime
+- **Impact Handling**: Supports both trigger and collision-based impact detection
+
+### Architecture Pattern: Mode-Dependent Behaviors
+The aiming and weapons systems demonstrate the mode-dependent pattern where behaviors are enabled/disabled based on `VehicleMode`. This pattern should be extended for future features:
+- Check `TransformationController.currentMode` to determine active form
+- Enable/disable component functionality in Update() based on mode
+- Use `GetComponentInParent<TransformationController>()` to access mode state
 
 ## Development Notes
 
@@ -55,8 +78,15 @@ Assets/
 - Car transformation aligns with camera forward direction (flattened to horizontal plane)
 - Both prefabs need TransformationController with `carPrefab` and `robotPrefab` assigned in Inspector
 
+### Working with Projectiles
+- Use velocity-based physics (Rigidbody.linearVelocity) rather than transform-based movement
+- Always call `Projectile.SetShooter()` after instantiation to prevent self-collision
+- Spawn projectiles at `childObject.transform.position + childObject.transform.forward * 2` to avoid immediate collision
+- VFX instantiation uses same rotation as projectile for consistent directionality
+
 ### Input System Configuration
-- Action map: **Player** with actions for Move (WASD/arrows/gamepad), Look (mouse/right stick), Attack (LMB/button), Jump (Space/button), Interact (E/button hold), Transform (bound to T - see TransformationController)
+- Action map: **Player** with actions for Move (WASD/arrows/gamepad), Look (mouse/right stick), Attack (LMB/button), Jump (Space/button), Interact (E/button hold)
+- Transform action exists in InputActions but TransformationController currently uses direct KeyCode.T input
 - Supports multiple control schemes: Keyboard&Mouse, Gamepad, Touch, Joystick, XR
 
 ### Testing in Unity
@@ -64,7 +94,7 @@ Assets/
 2. Open `Assets/Scenes/SampleScene.unity`
 3. Press Play to test transformation and aiming systems
 4. Use T to transform between car and robot modes
-5. In robot mode, mouse movement controls aiming direction
+5. In robot mode, mouse movement controls aiming direction, LMB fires weapon
 
 ### Common Tasks
 
@@ -90,8 +120,18 @@ The transformation system uses prefab swapping rather than animation/timeline se
 - Components that depend on specific GameObjects must handle prefab swapping gracefully
 - Consider adding a state manager if more persistent data is needed
 
-### Mode-Dependent Behaviors
-The aiming system demonstrates the mode-dependent pattern where behaviors are enabled/disabled based on `VehicleMode`. Use this pattern for future weapon systems or movement controllers.
+### Parent-Child Component Communication
+The architecture uses a parent GameObject (Player.prefab) with child form prefabs:
+- Parent holds TransformationController and SimpleGun (persistent across transformations)
+- Children hold form-specific components like AimingController
+- Use `GetComponentInParent<T>()` for child → parent communication
+- Use `GetChild(0).GetComponent<T>()` for parent → child communication
+- SimpleGun accesses AimingController via `transform.GetChild(0).GetComponent<AimingController>()`
+
+### Unity 6 API Changes
+The project uses Unity 6 which introduces API changes:
+- `Rigidbody.velocity` → `Rigidbody.linearVelocity`
+- Ensure new code uses current Unity 6 APIs
 
 ## Future Development Considerations
 
@@ -99,6 +139,7 @@ The aiming system demonstrates the mode-dependent pattern where behaviors are en
 - Use `AimingController.GetAimDirection()` to determine projectile direction
 - Implement weapon components that check `TransformationController.currentMode` for mode-specific weapon availability
 - Consider creating a weapon manager that handles transformation state changes
+- Current SimpleGun is attached to parent - can fire in both modes but only aims properly in robot mode
 
 ### State Persistence
 - Current implementation doesn't preserve velocity, rotation speed, or other physics state across transformations
@@ -106,4 +147,4 @@ The aiming system demonstrates the mode-dependent pattern where behaviors are en
 
 ### Camera System
 - Both systems reference `Camera.main` - consider creating a dedicated camera controller for more complex camera behaviors
-- Camera direction influences car transformation alignment (see TransformationController.cs:78-90)
+- Camera direction influences car transformation alignment (see TransformationController.cs:99-111)
